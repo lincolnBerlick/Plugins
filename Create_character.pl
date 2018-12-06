@@ -65,9 +65,9 @@ print "redirecionado para criar accounts \n\n\n\n";
 
 $mech->set_fields(
 
-				 'ctl00$ContentPlaceHolder1$usernameInput'    => 'servoppp1', # 
-				 'ctl00$ContentPlaceHolder1$passwordInput'    => 'novidade@',
-				 'ctl00$ContentPlaceHolder1$rePasswordInput'  => 'novidade@',
+				 'ctl00$ContentPlaceHolder1$usernameInput'    => "$username, # 
+				 'ctl00$ContentPlaceHolder1$passwordInput'    => "$password",
+				 'ctl00$ContentPlaceHolder1$rePasswordInput'  => "$password",
 				 'ctl00$ContentPlaceHolder1$gender'    => 'Masculino',
 				 'ctl00$ContentPlaceHolder1$agreement' => 'on',
 
