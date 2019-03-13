@@ -1,0 +1,88 @@
+macro vendanpc {
+
+:initvenda
+
+$itemvenda = findeitem()
+log $itemvenda
+$pesototal = $.maxweight
+$talknpc = @config(storageAuto_npc_steps)
+do move payon 172 97
+do talknpc 181 104 $talknpc
+pause 3
+
+do storage get $itemvenda 1 
+pause 2
+do storage close
+pause 3
+$pesoitem = pegarpeso("$itemvenda")
+log $pesoitem
+$quantidadepegar = @eval (int($pesototal/$pesoitem)-20 -(int($.weight)))
+pause 1
+
+goto comecarvenda
+
+
+
+
+:comecarvenda
+
+log vou pegar $quantidadepegar $itemvenda
+if (@invamount($itemvenda) < 5 && @storamount($itemvenda) > 0 ) {
+do talknpc 181 104 $talknpc
+pause 3
+do storage get $itemvenda $quantidadepegar	
+do storage close
+pause 1
+goto comecarvenda
+}
+
+if (@invamount($itemvenda) > 1 ) {
+do talk @npc (159 96) 
+do sell
+pause 0.5
+do sell @inventory($itemvenda)
+do sell done
+goto comecarvenda
+}
+
+if (@storamount($itemvenda) < 1 && @invamount($itemvenda) < 1) {
+log todos os items foram vendidos
+
+goto initvenda
+
+}
+}
+
+
+sub findeitem {
+open(SHUUP, "<:utf8", Settings::getControlFilename("listasell.txt"));  #pronto oq era?
+my @line = <SHUUP>;
+my $item = pop @line;
+close(SHUUP);
+ 
+open(SHUUP, ">:utf8", Settings::getControlFilename("listasell.txt"));  
+
+chomp($line[scalar(@line) -1]);
+print SHUUP (@line);
+close(SHUUP);
+
+message "\$item é $item\n";
+
+return $item;
+}
+  
+  
+sub pegarpeso {
+    my ($nome) = @_;
+    my $item = Match::inventoryItem($nome);
+    my $descricao = $itemsDesc_lut{$item->{nameID}};
+     if ($descricao =~ /Peso:\s+(\d+)/) {
+	 message "$1";
+        return $1;
+       
+    } 
+}
+
+
+
+
