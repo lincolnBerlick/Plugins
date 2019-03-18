@@ -1,9 +1,21 @@
+#
+
+#######################################################  VENDA DE ITENS  ################################################################
+
 macro vendanpc {
+
+
+
+$listdevenda = findeitem()
 
 :initvenda
 
-$itemvenda = findeitem()
-log $itemvenda
+if ( $listdevenda > 0 ) {
+
+log $listdevenda
+$itemvenda =  findeitem($listdevenda)
+
+
 $pesototal = $.maxweight
 $talknpc = @config(storageAuto_npc_steps)
 do move payon 172 97
@@ -14,10 +26,18 @@ do storage get $itemvenda 1
 pause 2
 do storage close
 pause 3
+
+if (@storage($itemvenda) > 0 ) {
 $pesoitem = pegarpeso("$itemvenda")
 log $pesoitem
 $quantidadepegar = @eval (int($pesototal/$pesoitem)-20 -(int($.weight)))
 pause 1
+} else {
+log ===========================NAO TENHO O $itemvenda VOU PARA O PRXIMO =============
+$listdevenda = getlastitem($listdevenda)
+goto initvenda
+
+}
 
 goto comecarvenda
 
@@ -48,29 +68,48 @@ goto comecarvenda
 if (@storamount($itemvenda) < 1 && @invamount($itemvenda) < 1) {
 log todos os items foram vendidos
 
+$listdevenda = getlastitem($listdevenda)
 goto initvenda
+
+}
+} else {
+	log ====================MACRO FINALIZADA======================
 
 }
 }
 
 
 sub findeitem {
-open(SHUUP, "<:utf8", Settings::getControlFilename("listasell.txt"));  #pronto oq era?
-my @line = <SHUUP>;
-my $item = pop @line;
-close(SHUUP);
+ my ($index) = @_;
  
-open(SHUUP, ">:utf8", Settings::getControlFilename("listasell.txt"));  
 
-chomp($line[scalar(@line) -1]);
-print SHUUP (@line);
+
+
+my @array;
+
+open(SHUUP, "<:utf8", Settings::getControlFilename("listasell.txt"));  #pronto oq era?
+while(my $line = <SHUUP>){
+push (@array, $line);
+
+}
 close(SHUUP);
 
-message "\$item é $item\n";
+if($index > 0 ) {
 
-return $item;
+
+return $array[$index];
+
+
+
 }
-  
+else {
+
+
+
+return scalar @array -1;
+
+}
+}
   
 sub pegarpeso {
     my ($nome) = @_;
@@ -83,6 +122,11 @@ sub pegarpeso {
     } 
 }
 
+sub getlastitem  {
+	my ($lastitem) = @_;	
+	
+	return $lastitem -1;
+	
 
 
-
+}
