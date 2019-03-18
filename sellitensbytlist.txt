@@ -1,8 +1,90 @@
-#
-
 #######################################################  VENDA DE ITENS  ################################################################
 
 macro vendanpc {
+
+
+log ==============================================================================
+log ===========================iniciando macro de vendas =========================
+log ==============================================================================
+$listdevenda = findeitem()
+$talknpc = @config(storageAuto_npc_steps)
+do talknpc 181 104 $talknpc 
+pause 5
+do storage close 
+
+:initvenda
+
+
+if ( $listdevenda > 0 ) {
+
+	log $listdevenda
+	$itemvenda =  findeitem($listdevenda)
+
+
+	if (@Storage($itemvenda) > 0) {
+		$pesototal = $.maxweight
+
+		do move payon 172 97
+		do talknpc 181 104 $talknpc
+		pause 3
+		do storage get $itemvenda 1 
+
+		pause 2
+		do storage close
+		pause 3
+		$pesoitem = pegarpeso("$itemvenda")
+		$quantidadepegar = @eval (int($pesototal/$pesoitem)-20 -(int($.weight)))
+		pause 1
+	} else {
+		log ===========================NAO TENHO O $itemvenda VOU PARA O PRXIMO =============
+		$listdevenda = getlastitem($listdevenda)
+		goto initvenda
+
+	}
+
+	goto comecarvenda
+
+
+
+
+	:comecarvenda
+
+	log vou pegar $quantidadepegar $itemvenda
+	if (@invamount($itemvenda) < 5 && @storamount($itemvenda) > 0 ) {
+		do talknpc 181 104 $talknpc
+		pause 3
+		do storage get $itemvenda $quantidadepegar	
+		do storage close
+		pause 1
+		goto comecarvenda
+	}
+
+	if (@invamount($itemvenda) > 1 ) {
+		do talk @npc (159 96) 
+		do sell
+		pause 0.5
+		do sell @inventory($itemvenda)
+		do sell done
+		goto comecarvenda
+	}
+
+	if (@storamount($itemvenda) < 1 && @invamount($itemvenda) < 1) {
+		log todos os items foram vendidos
+
+		$listdevenda = getlastitem($listdevenda)
+		goto initvenda
+
+	}
+	} else {
+		log ==============================================================================
+		log ===========================Macro Finalizada =========================
+		log ==============================================================================
+
+	}
+}
+
+
+macro newvenda {
 
 
 
@@ -12,103 +94,42 @@ $listdevenda = findeitem()
 
 if ( $listdevenda > 0 ) {
 
-log $listdevenda
-$itemvenda =  findeitem($listdevenda)
+	log $listdevenda
+	$itemvenda =  findeitem ($listdevenda)
+	$item1 = $itemvenda
 
+	$item = @storamount ($itemvenda)
 
-$pesototal = $.maxweight
-$talknpc = @config(storageAuto_npc_steps)
-do move payon 172 97
-do talknpc 181 104 $talknpc
-pause 3
+	log $item ($itemvenda) e  $item1
 
-do storage get $itemvenda 1 
-pause 2
-do storage close
-pause 3
+	$listdevenda = getlastitem($listdevenda)
+	goto initvenda
 
-if (@storage($itemvenda) > 0 ) {
-$pesoitem = pegarpeso("$itemvenda")
-log $pesoitem
-$quantidadepegar = @eval (int($pesototal/$pesoitem)-20 -(int($.weight)))
-pause 1
-} else {
-log ===========================NAO TENHO O $itemvenda VOU PARA O PRXIMO =============
-$listdevenda = getlastitem($listdevenda)
-goto initvenda
-
-}
-
-goto comecarvenda
-
-
-
-
-:comecarvenda
-
-log vou pegar $quantidadepegar $itemvenda
-if (@invamount($itemvenda) < 5 && @storamount($itemvenda) > 0 ) {
-do talknpc 181 104 $talknpc
-pause 3
-do storage get $itemvenda $quantidadepegar	
-do storage close
-pause 1
-goto comecarvenda
-}
-
-if (@invamount($itemvenda) > 1 ) {
-do talk @npc (159 96) 
-do sell
-pause 0.5
-do sell @inventory($itemvenda)
-do sell done
-goto comecarvenda
-}
-
-if (@storamount($itemvenda) < 1 && @invamount($itemvenda) < 1) {
-log todos os items foram vendidos
-
-$listdevenda = getlastitem($listdevenda)
-goto initvenda
-
-}
-} else {
-	log ====================MACRO FINALIZADA======================
 
 }
 }
-
 
 sub findeitem {
- my ($index) = @_;
- 
-
-
-
+	my ($index) = @_;
 my @array;
 
 open(SHUUP, "<:utf8", Settings::getControlFilename("listasell.txt"));  #pronto oq era?
-while(my $line = <SHUUP>){
-push (@array, $line);
+	while(my $line = <SHUUP>){
+	push (@array, $line);
 
-}
+	}
 close(SHUUP);
 
 if($index > 0 ) {
-
-
-return $array[$index];
-
-
-
+ 
+	my $retorno = $array[$index];
+	chomp $retorno;
+	return $retorno;
 }
-else {
+	else {
 
-
-
-return scalar @array -1;
-
-}
+		return scalar @array -1;
+	}
 }
   
 sub pegarpeso {
