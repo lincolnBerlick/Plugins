@@ -1,0 +1,47 @@
+##### Pharmacy Creation CODE : Credit to flakey of OpenKore Board #####
+##### [url]http://openkore.sour***orge.net/foru...pic.php?t=5000[/url] #####
+##### send (code) after invoke "ss 228 10" only ... therefore Kore terminate !
+##### Red Potion = 8E 01 F5 01 00 00 00 00 00 00
+##### Yellow Potion = 8E 01 F7 01 00 00 00 00 00 00
+##### White Potion = 8E 01 F8 01 00 00 00 00 00 00
+##### Blue Potion = 8E 01 F9 01 00 00 00 00 00 00
+##### Adonyne = 8E 01 5D 02 00 00 00 00 00 00
+##### Aloevera = 8E 01 5E 02 00 00 00 00 00 00
+##### Red Slim = 8E 01 21 02 00 00 00 00 00 00
+##### Yellow Slim = 8E 01 22 02 00 00 00 00 00 00
+##### White Slim = 8E 01 23 02 00 00 00 00 00 00
+##### Alcohol = 8E 01 CA 03 00 00 00 00 00 00
+##### Fire Bottle = 8E 01 DF 1B 00 00 00 00 00 00
+##### Acid Bottle = 8E 01 E0 1B 00 00 00 00 00 00
+##### Plant Bottle = 8E 01 E1 1B 00 00 00 00 00 00
+##### Mine Bottle = 8E 01 E2 1B 00 00 00 00 00 00
+##### Coating Wax = 8E 01 E3 1B 00 00 00 00 00 00
+
+automacro create {
+	location 
+	sp > 15%
+	status Marionette Control
+	status not Harmonize
+	inventory "Coração Imortal" > 10
+	inventory "Garrafa Vazia" > 10
+	inventory "Vasilha de Mistura" > 10
+	inventory "Scell" > 10
+	exclusive 1
+	call pharmacy
+}
+
+macro pharmacy {
+
+	while (@invamount (Coração Imortal) > 10 && @invamount (Garrafa Vazia) > 10 && @invamount (Vasilha de Mistura) > 10) as loop
+	if (@invamount (Coração Imortal) > 10 && @invamount (Garrafa Vazia) > 10 && @invamount (Vasilha de Mistura) > 10) {
+	do ss 228 10
+	do send 8E 01 E0 1B 00 00 00 00 00 00
+	}
+	
+	if (@invamount(Coração Imortal) < 11 || @invamount(Garrafa Vazia) < 11 || @invamount(Vasilha de Mistura) < 11) {
+	
+	stop
+	
+	}
+	end loop
+}
