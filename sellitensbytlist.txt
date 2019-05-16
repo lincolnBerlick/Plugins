@@ -123,7 +123,8 @@ close(SHUUP);
 if($index > 0 ) {
  
 	my $retorno = $array[$index];
-	chomp $retorno;
+	 $retorno =~ s/\R+//g;
+	 
 	return $retorno;
 }
 	else {
